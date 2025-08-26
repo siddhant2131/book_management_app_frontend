@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   // Set base URL for API calls
-  axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://book-management-app-backend-dur0.onrender.com';
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app/';
 
   useEffect(() => {
     if (token) {
