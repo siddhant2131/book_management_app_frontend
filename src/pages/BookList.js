@@ -201,7 +201,6 @@
 // };
 
 // export default BookList;
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -284,11 +283,9 @@ const BookList = () => {
   const handleLike = async (bookId) => {
     try {
       setLiking(true);
-      // First, check if the book already has likes array
       const bookToUpdate = books.find(book => book._id === bookId);
       const currentLikes = bookToUpdate.likes || [];
       
-      // Check if current user already liked this book
       const userLikedIndex = currentLikes.findIndex(like => like.userId === currentUser.id);
       
       let updatedLikes;
@@ -303,12 +300,8 @@ const BookList = () => {
         }];
       }
       
-      // Update the book with new likes array
-      const response = await axios.patch(`/api/books/${bookId}`, {
-        likes: updatedLikes
-      });
+      await axios.patch(`/api/books/${bookId}`, { likes: updatedLikes });
       
-      // Update local state
       setBooks(prevBooks => 
         prevBooks.map(book => 
           book._id === bookId ? { ...book, likes: updatedLikes } : book
@@ -343,10 +336,7 @@ const BookList = () => {
       <Grid container spacing={4}>
         {/* Add Book Form */}
         <Grid item xs={12} md={5}>
-          <Card sx={{ 
-            animation: 'slideIn 0.5s ease-out',
-            height: '100%'
-          }}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                 Add New Book
@@ -411,13 +401,7 @@ const BookList = () => {
 
         {/* Book List */}
         <Grid item xs={12} md={7}>
-          <Card sx={{ 
-            animation: 'slideIn 0.5s ease-out',
-            animationDelay: '0.1s',
-            height: '100%',
-            maxHeight: '600px',
-            overflow: 'auto'
-          }}>
+          <Card sx={{ height: '100%', maxHeight: '600px', overflow: 'auto' }}>
             <CardContent>
               <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                 Your Books ({books.length})
@@ -429,7 +413,6 @@ const BookList = () => {
                 </Box>
               ) : books.length === 0 ? (
                 <Box textAlign="center" py={4}>
-                  <BookIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                   <Typography variant="body1" color="text.secondary">
                     No books added yet. Start by adding your first book!
                   </Typography>
@@ -440,7 +423,6 @@ const BookList = () => {
                     <ListItem 
                       key={book._id}
                       sx={{ 
-                        animation: `fadeIn 0.3s ease-out ${index * 0.05}s`,
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                         '&:last-child': { borderBottom: 'none' },
@@ -456,20 +438,23 @@ const BookList = () => {
                             <Typography variant="h6" component="span" fontWeight="medium">
                               {book.title}
                             </Typography>
-                            <Chip
-                              size="small"
-                              avatar={
-                                <Avatar sx={{ bgcolor: 'primary.main', width: 24, height: 24 }}>
-                                  <FavoriteIcon sx={{ fontSize: 14 }} />
-                                </Avatar>
-                              }
-                              label={getLikeCount(book)}
-                              variant="outlined"
-                              sx={{ 
-                                borderColor: 'primary.main',
-                                color: 'primary.main'
-                              }}
-                            />
+                            {/* Only show chip if likes > 0 */}
+                            {getLikeCount(book) > 0 && (
+                              <Chip
+                                size="small"
+                                avatar={
+                                  <Avatar sx={{ bgcolor: 'primary.main', width: 24, height: 24 }}>
+                                    <FavoriteIcon sx={{ fontSize: 14 }} />
+                                  </Avatar>
+                                }
+                                label={getLikeCount(book)}
+                                variant="outlined"
+                                sx={{ 
+                                  borderColor: 'primary.main',
+                                  color: 'primary.main'
+                                }}
+                              />
+                            )}
                           </Box>
                         }
                         secondary={`by ${book.author}`}
