@@ -4,40 +4,147 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#4e54c8" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="A modern book management application to organize your reading collection"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta name="keywords" content="books, reading, management, collection, MERN stack" />
+    <meta name="author" content="Book Management App" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://book-management-app-frontend-xi.vercel.app/" />
+    <meta property="og:title" content="Book Management App" />
+    <meta property="og:description" content="A modern book management application to organize your reading collection" />
+    <meta property="og:image" content="%PUBLIC_URL%/social-preview.png" />
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://book-management-app-frontend-xi.vercel.app/" />
+    <meta property="twitter:title" content="Book Management App" />
+    <meta property="twitter:description" content="A modern book management application to organize your reading collection" />
+    <meta property="twitter:image" content="%PUBLIC_URL%/social-preview.png" />
+    
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    
+    <!-- Structured data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Book Management App",
+      "url": "https://book-management-app-frontend-xi.vercel.app/",
+      "description": "A modern book management application to organize your reading collection",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Web Browser",
+      "permissions": "browser",
+      "author": {
+        "@type": "Organization",
+        "name": "Book Management App Team"
+      }
+    }
+    </script>
+ 
+    <title>BookShelf - Manage Your Reading Collection</title>
+    
+    <style>
+      /* Critical CSS to prevent layout shift while React loads */
+      body {
+        margin: 0;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f8f9fa;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading animation for initial app load */
+      .app-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        z-index: 9999;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>You need to enable JavaScript to run this application.</p>
+        <p>Book Management App is built with React.js which requires JavaScript to function properly.</p>
+      </div>
+    </noscript>
+    
+    <!-- Initial loading screen (removed by React when app loads) -->
+    <div id="app-loading" class="app-loading">
+      <div>
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 20px;">Loading BookShelf...</p>
+      </div>
+    </div>
+    
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    
+    <!-- Performance monitoring script -->
+    <script>
+      // Remove loading screen when app is mounted
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loadingElement = document.getElementById('app-loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
+          }
+        }, 500);
+      });
+      
+      // Simple performance monitoring
+      window.addEventListener('load', function() {
+        if ('performance' in window) {
+          const perfData = window.performance.timing;
+          const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+          const domReadyTime = perfData.domContentLoadedEventEnd - perfData.navigationStart;
+          
+          console.log('Page load time:', pageLoadTime, 'ms');
+          console.log('DOM ready time:', domReadyTime, 'ms');
+        }
+      });
+    </script>
   </body>
 </html>
