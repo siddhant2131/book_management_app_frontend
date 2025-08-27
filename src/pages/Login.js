@@ -12,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   // FIX: Add fallback for environment variable
-  const API_BASE = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app/';
+  const API_BASE = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
