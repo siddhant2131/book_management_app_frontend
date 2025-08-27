@@ -1,243 +1,15 @@
-// import React, { useState, useEffect } from 'react';
-// import { useAuth } from '../context/AuthContext';
-// import axios from 'axios';
-// import {
-//   Container,
-//   Grid,
-//   Card,
-//   CardContent,
-//   TextField,
-//   Button,
-//   Typography,
-//   Box,
-//   Alert,
-//   CircularProgress,
-//   List,
-//   ListItem,
-//   ListItemText,
-//   IconButton
-// } from '@mui/material';
-// import { Add as AddIcon, Book as BookIcon } from '@mui/icons-material';
-
-// const BookList = () => {
-//   const [books, setBooks] = useState([]);
-//   const [title, setTitle] = useState('');
-//   const [author, setAuthor] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const [fetching, setFetching] = useState(true);
-//   const [error, setError] = useState('');
-//   const { logout } = useAuth();
-
-//   useEffect(() => {
-//     fetchBooks();
-//   }, []);
-
-//   const fetchBooks = async () => {
-//     try {
-//       setFetching(true);
-//       const response = await axios.get('/api/books');
-//       setBooks(response.data);
-//     } catch (error) {
-//       if (error.response?.status === 401) {
-//         logout();
-//       } else {
-//         setError('Failed to fetch books');
-//       }
-//     } finally {
-//       setFetching(false);
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-    
-//     if (!title || !author) {
-//       return setError('Please fill in all fields');
-//     }
-    
-//     try {
-//       setLoading(true);
-//       setError('');
-//       await axios.post('/api/books', { title, author });
-//       setTitle('');
-//       setAuthor('');
-//       fetchBooks(); // Refresh the list
-//     } catch (error) {
-//       setError('Failed to add book');
-//     }
-    
-//     setLoading(false);
-//   };
-
-//   return (
-//     <Container maxWidth="lg" sx={{ py: 4 }}>
-//       <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ 
-//         mb: 4, 
-//         color: 'primary.main',
-//         fontWeight: 'bold'
-//       }}>
-//         My Book Collection
-//       </Typography>
-      
-//       <Grid container spacing={4}>
-//         {/* Add Book Form */}
-//         <Grid item xs={12} md={6}>
-//           <Card sx={{ 
-//             animation: 'slideIn 0.5s ease-out',
-//             height: '100%'
-//           }}>
-//             <CardContent>
-//               <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-//                 Add New Book
-//               </Typography>
-              
-//               {error && (
-//                 <Alert severity="error" sx={{ mb: 2 }}>
-//                   {error}
-//                 </Alert>
-//               )}
-              
-//               <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-//                 <TextField
-//                   margin="normal"
-//                   required
-//                   fullWidth
-//                   id="title"
-//                   label="Book Title"
-//                   name="title"
-//                   autoComplete="off"
-//                   value={title}
-//                   onChange={(e) => setTitle(e.target.value)}
-//                   sx={{ mb: 2 }}
-//                 />
-//                 <TextField
-//                   margin="normal"
-//                   required
-//                   fullWidth
-//                   name="author"
-//                   label="Author"
-//                   type="text"
-//                   id="author"
-//                   autoComplete="off"
-//                   value={author}
-//                   onChange={(e) => setAuthor(e.target.value)}
-//                   sx={{ mb: 3 }}
-//                 />
-//                 <Button
-//                   type="submit"
-//                   fullWidth
-//                   variant="contained"
-//                   disabled={loading}
-//                   size="large"
-//                   startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
-//                   sx={{
-//                     py: 1.5,
-//                     fontSize: '1.1rem',
-//                     background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-//                     '&:hover': {
-//                       transform: 'translateY(-1px)',
-//                       boxShadow: 3
-//                     },
-//                     transition: 'all 0.2s ease-in-out'
-//                   }}
-//                 >
-//                   {loading ? 'Adding...' : 'Add Book'}
-//                 </Button>
-//               </Box>
-//             </CardContent>
-//           </Card>
-//         </Grid>
-
-//         {/* Book List */}
-//         <Grid item xs={12} md={6}>
-//           <Card sx={{ 
-//             animation: 'slideIn 0.5s ease-out',
-//             animationDelay: '0.1s',
-//             height: '100%'
-//           }}>
-//             <CardContent>
-//               <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-//                 Your Books
-//               </Typography>
-              
-//               {fetching ? (
-//                 <Box display="flex" justifyContent="center" alignItems="center" py={4}>
-//                   <CircularProgress />
-//                 </Box>
-//               ) : books.length === 0 ? (
-//                 <Box textAlign="center" py={4}>
-//                   <BookIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-//                   <Typography variant="body1" color="text.secondary">
-//                     No books added yet. Start by adding your first book!
-//                   </Typography>
-//                 </Box>
-//               ) : (
-//                 <List>
-//                   {books.map((book, index) => (
-//                     <ListItem 
-//                       key={book._id}
-//                       sx={{ 
-//                         animation: `fadeIn 0.3s ease-out ${index * 0.05}s`,
-//                         borderBottom: '1px solid',
-//                         borderColor: 'divider',
-//                         '&:last-child': { borderBottom: 'none' }
-//                       }}
-//                     >
-//                       <ListItemText
-//                         primary={book.title}
-//                         secondary={`by ${book.author}`}
-//                         primaryTypographyProps={{ fontWeight: 'medium' }}
-//                       />
-//                     </ListItem>
-//                   ))}
-//                 </List>
-//               )}
-//             </CardContent>
-//           </Card>
-//         </Grid>
-//       </Grid>
-//     </Container>
-//   );
-// };
-
-// export default BookList;
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
-import {
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Chip,
-  Avatar
-} from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Book as BookIcon, 
-  Favorite as FavoriteIcon,
-  FavoriteBorder as FavoriteBorderIcon
-} from '@mui/icons-material';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [liking, setLiking] = useState(false);
-  const { logout, currentUser } = useAuth();
+  const { currentUser } = useAuth();
+
+  // FIX: Add fallback for environment variable
+  const API_BASE = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app/';
 
   useEffect(() => {
     fetchBooks();
@@ -245,244 +17,105 @@ const BookList = () => {
 
   const fetchBooks = async () => {
     try {
-      setFetching(true);
-      const response = await axios.get('/api/books');
-      setBooks(response.data);
-    } catch (error) {
-      if (error.response?.status === 401) {
-        logout();
-      } else {
-        setError('Failed to fetch books');
-      }
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!title || !author) {
-      return setError('Please fill in all fields');
-    }
-    
-    try {
-      setLoading(true);
-      setError('');
-      await axios.post('/api/books', { title, author });
-      setTitle('');
-      setAuthor('');
-      fetchBooks(); // Refresh the list
-    } catch (error) {
-      setError('Failed to add book');
-    }
-    
-    setLoading(false);
-  };
-
-  const handleLike = async (bookId) => {
-    try {
-      setLiking(true);
-      const bookToUpdate = books.find(book => book._id === bookId);
-      const currentLikes = bookToUpdate.likes || [];
+      const response = await fetch(`${API_BASE}/api/books`, {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
       
-      const userLikedIndex = currentLikes.findIndex(like => like.userId === currentUser.id);
-      
-      let updatedLikes;
-      if (userLikedIndex > -1) {
-        // Unlike - remove user's like
-        updatedLikes = currentLikes.filter(like => like.userId !== currentUser.id);
-      } else {
-        // Like - add user's like
-        updatedLikes = [...currentLikes, { 
-          userId: currentUser.id, 
-          timestamp: new Date().toISOString() 
-        }];
+      if (!response.ok) {
+        throw new Error('Failed to fetch books');
       }
       
-      await axios.patch(`/api/books/${bookId}`, { likes: updatedLikes });
-      
-      setBooks(prevBooks => 
-        prevBooks.map(book => 
-          book._id === bookId ? { ...book, likes: updatedLikes } : book
-        )
-      );
-    } catch (error) {
-      console.error('Error updating like:', error);
-      setError('Failed to update like');
+      const data = await response.json();
+      setBooks(data);
+    } catch (err) {
+      console.error('Fetch books error:', err);
+      setError('Error fetching books');
     } finally {
-      setLiking(false);
+      setLoading(false);
     }
   };
 
-  const isBookLikedByUser = (book) => {
-    return book.likes && book.likes.some(like => like.userId === currentUser.id);
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this book?')) return;
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/books/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete book');
+      }
+      
+      // Remove the book from the list
+      setBooks(books.filter(book => book._id !== id));
+    } catch (err) {
+      console.error('Delete book error:', err);
+      setError('Error deleting book');
+    }
   };
 
-  const getLikeCount = (book) => {
-    return book.likes ? book.likes.length : 0;
-  };
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ 
-        mb: 4, 
-        color: 'primary.main',
-        fontWeight: 'bold'
-      }}>
-        My Book Collection
-      </Typography>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Book List</h1>
+        <Link 
+          to="/add-book" 
+          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+        >
+          Add New Book
+        </Link>
+      </div>
       
-      <Grid container spacing={4}>
-        {/* Add Book Form */}
-        <Grid item xs={12} md={5}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                Add New Book
-              </Typography>
-              
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
-              
-              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="title"
-                  label="Book Title"
-                  name="title"
-                  autoComplete="off"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="author"
-                  label="Author"
-                  type="text"
-                  id="author"
-                  autoComplete="off"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  sx={{ mb: 3 }}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  disabled={loading}
-                  size="large"
-                  startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
-                  sx={{
-                    py: 1.5,
-                    fontSize: '1.1rem',
-                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                    '&:hover': {
-                      transform: 'translateY(-1px)',
-                      boxShadow: 3
-                    },
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                >
-                  {loading ? 'Adding...' : 'Add Book'}
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Book List */}
-        <Grid item xs={12} md={7}>
-          <Card sx={{ height: '100%', maxHeight: '600px', overflow: 'auto' }}>
-            <CardContent>
-              <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                Your Books ({books.length})
-              </Typography>
-              
-              {fetching ? (
-                <Box display="flex" justifyContent="center" alignItems="center" py={4}>
-                  <CircularProgress />
-                </Box>
-              ) : books.length === 0 ? (
-                <Box textAlign="center" py={4}>
-                  <Typography variant="body1" color="text.secondary">
-                    No books added yet. Start by adding your first book!
-                  </Typography>
-                </Box>
-              ) : (
-                <List>
-                  {books.map((book, index) => (
-                    <ListItem 
-                      key={book._id}
-                      sx={{ 
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
-                        '&:last-child': { borderBottom: 'none' },
-                        '&:hover': {
-                          backgroundColor: 'action.hover',
-                          transition: 'background-color 0.2s ease-in-out'
-                        }
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="h6" component="span" fontWeight="medium">
-                              {book.title}
-                            </Typography>
-                            {/* Only show chip if likes > 0 */}
-                            {getLikeCount(book) > 0 && (
-                              <Chip
-                                size="small"
-                                avatar={
-                                  <Avatar sx={{ bgcolor: 'primary.main', width: 24, height: 24 }}>
-                                    <FavoriteIcon sx={{ fontSize: 14 }} />
-                                  </Avatar>
-                                }
-                                label={getLikeCount(book)}
-                                variant="outlined"
-                                sx={{ 
-                                  borderColor: 'primary.main',
-                                  color: 'primary.main'
-                                }}
-                              />
-                            )}
-                          </Box>
-                        }
-                        secondary={`by ${book.author}`}
-                        sx={{ mr: 2 }}
-                      />
-                      <IconButton
-                        onClick={() => handleLike(book._id)}
-                        disabled={liking}
-                        sx={{
-                          color: isBookLikedByUser(book) ? 'error.main' : 'action.active',
-                          '&:hover': {
-                            color: 'error.main',
-                            transform: 'scale(1.1)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                      >
-                        {isBookLikedByUser(book) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                      </IconButton>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Container>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+      
+      {books.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <p className="text-gray-600">No books found. Add your first book!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {books.map(book => (
+            <div key={book._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">{book.title}</h2>
+                <p className="text-gray-600 mb-4">by {book.author}</p>
+                <div className="flex justify-between">
+                  <button 
+                    onClick={() => handleDelete(book._id)}
+                    className="text-red-600 hover:text-red-800 transition"
+                  >
+                    Delete
+                  </button>
+                  <span className="text-sm text-gray-500">
+                    {new Date(book.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

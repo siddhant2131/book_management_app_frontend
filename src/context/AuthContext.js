@@ -1,88 +1,46 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+// context/AuthContext.js
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
+export function useAuth() {
   return useContext(AuthContext);
-};
+}
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
-
-  // Set base URL for API calls
-  axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app/';
 
   useEffect(() => {
+    // Check if user is logged in on app load
+    const token = localStorage.getItem('token');
     if (token) {
-      localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchUserData();
-    } else {
-      setLoading(false);
+      // In a real app, you would verify the token with your backend
+      setCurrentUser({ token });
     }
-  }, [token]);
+    setLoading(false);
+  }, []);
 
-  const fetchUserData = async () => {
-    try {
-      // Since we don't have a user endpoint, we'll just validate the token
-      // by making a simple request to the books endpoint
-      await axios.get('/api/books');
-      // If successful, set a mock user (you might want to store user data in your JWT)
-      setCurrentUser({ email: 'user@example.com' });
-    } catch (error) {
-      console.error('Token validation failed:', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    setCurrentUser({ token });
   };
 
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post('/api/auth/login', { email, password });
-      const { token, data } = response.data;
-      setToken(token);
-      setCurrentUser(data.user);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
-      };
-    }
-  };
-
-  const register = async (email, password) => {
-    try {
-      const response = await axios.post('/api/auth/register', { email, password });
-      const { token, data } = response.data;
-      setToken(token);
-      setCurrentUser(data.user);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
-      };
-    }
+  const register = (token) => {
+    localStorage.setItem('token', token);
+    setCurrentUser({ token });
   };
 
   const logout = () => {
-    setToken(null);
-    setCurrentUser(null);
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+    setCurrentUser(null);
   };
 
   const value = {
     currentUser,
     login,
     register,
-    logout,
-    token
+    logout
   };
 
   return (
@@ -90,4 +48,4 @@ export const AuthProvider = ({ children }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
-};
+}

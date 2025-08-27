@@ -1,153 +1,138 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  Container,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  CircularProgress,
-  Link as MuiLink
-} from '@mui/material';
-import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  // FIX: Add fallback for environment variable
+  const API_BASE = process.env.REACT_APP_API_URL || 'https://book-management-backend-production-684d.up.railway.app/';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (password !== passwordConfirm) {
+    if (password !== confirmPassword) {
       return setError('Passwords do not match');
     }
     
     try {
       setError('');
       setLoading(true);
-      const result = await register(email, password);
       
-      if (result.success) {
-        navigate('/');
+      // API call to register - using environment variable with fallback
+      const response = await fetch(`${API_BASE}/api/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        register(data.token);
+        navigate('/books');
       } else {
-        setError(result.message);
+        setError(data.message || 'Registration failed');
       }
-    } catch (error) {
-      setError('Failed to create an account');
+    } catch (err) {
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Paper 
-        elevation={6} 
-        sx={{ 
-          p: 4, 
-          animation: 'fadeIn 0.6s ease-out',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
-        }}
-      >
-        <Box textAlign="center" mb={3}>
-          <PersonAddIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            Create Account
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Already have an account?{' '}
-            <MuiLink 
-              component={Link} 
-              to="/login" 
-              color="primary" 
-              fontWeight="medium"
-            >
-              Sign in
-            </MuiLink>
-          </Typography>
-        </Box>
-
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+        </div>
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
         )}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="email-address" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirm-password" className="sr-only">
+                Confirm Password
+              </label>
+              <input
+                id="confirm-password"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+          </div>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="passwordConfirm"
-            label="Confirm Password"
-            type="password"
-            id="passwordConfirm"
-            autoComplete="new-password"
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
-            sx={{ mb: 3 }}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            disabled={loading}
-            size="large"
-            sx={{
-              py: 1.5,
-              fontSize: '1.1rem',
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              '&:hover': {
-                transform: 'translateY(-1px)',
-                boxShadow: 3
-              },
-              transition: 'all 0.2s ease-in-out'
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={24} sx={{ color: 'white' }} />
-            ) : (
-              'Create Account'
-            )}
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {loading ? 'Creating account...' : 'Sign up'}
+            </button>
+          </div>
+          
+          <div className="text-center">
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
